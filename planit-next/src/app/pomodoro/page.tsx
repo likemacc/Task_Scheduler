@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Task } from '@/types';
+import { useMusic } from "@/components/music/MusicPlayerProvider";
+import MusicFilePicker from "@/components/music/MusicFilePicker";
+
 
 declare global {
   interface Window {
@@ -26,6 +29,18 @@ interface PomodoroSession {
 }
 
 export default function PomodoroPage() {
+  const {
+    loadPlaylist,
+    playCurrent,
+    pauseMusic,
+    resumeMusic,
+    stopMusic,
+    nextSong,
+    prevSong,
+    isPlaying,
+    fileName,
+  } = useMusic();
+  
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
@@ -267,6 +282,7 @@ export default function PomodoroPage() {
       <section className="flex-1 glass-panel rounded-xl sm:rounded-2xl p-4 sm:p-8 lg:p-12 flex flex-col text-gray-900 dark:text-white">
         
         <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-8 text-center">Pomodoro Timer</h1>
+        
 
         {/* MODE TABS: Pomodoro / Short Break / Long Break */}
         <div className="flex items-center justify-center gap-2 sm:gap-4 lg:gap-6 mb-6 sm:mb-10 overflow-x-auto">
@@ -446,8 +462,51 @@ export default function PomodoroPage() {
               </option>
             ))}
           </select>
+          {/* MUSIC PLAYER SECTION */}
+<div className="w-full mt-6 mb-8">
+  <div className="glass-panel rounded-xl sm:rounded-2xl p-4 sm:p-6 text-gray-900 dark:text-white shadow-lg">
+
+    <h2 className="text-lg sm:text-xl font-bold mb-4 text-center">
+      🎵 Music Player
+    </h2>
+
+    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+
+      
+      <div>
+        <MusicFilePicker />
+      </div>
+
+      
+      <button
+        onClick={isPlaying ? pauseMusic : resumeMusic}
+        disabled={!fileName}
+        className={`
+          px-5 py-2.5 rounded-lg font-semibold transition
+          ${isPlaying
+            ? "bg-red-500 hover:bg-red-600 text-white"
+            : "bg-green-500 hover:bg-green-600 text-white"
+          }
+          disabled:bg-gray-500 disabled:cursor-not-allowed
+        `}
+      >
+        {isPlaying ? "Pause Music" : "Play"}
+      </button>
+    </div>
+
+    
+    {fileName && (
+      <p className="text-xs sm:text-sm text-center mt-3 text-gray-500 dark:text-gray-400">
+        Now Playing: <span className="font-medium text-gray-800 dark:text-gray-200">{fileName}</span>
+      </p>
+    )}
+  </div>
+  
+</div>
         </div>
       </section>
+
+
 
       {/* SIDEBAR - Hidden on mobile, shown on lg screens */}
       <section className="hidden lg:flex w-80 glass-panel rounded-2xl p-8 flex-col text-gray-900 dark:text-white overflow-hidden">
